@@ -35,6 +35,7 @@ app.use(session({
 // Routes
 app.use('/auth', require('./routes/auth'));
 app.use('/admin', require('./routes/admin'));
+app.use('/', require('./routes/user'));
 
 // Root Path Redirect
 app.get('/', (req, res) => res.redirect('/auth/login'));
