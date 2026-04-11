@@ -1,0 +1,197 @@
+<%- include('partials/head') %>
+
+<div class="min-h-screen bg-[#0F172A] font-sans antialiased text-slate-300 selection:bg-indigo-500/30 p-4 md:p-8">
+    
+    <div class="max-w-[1500px] mx-auto bg-slate-900/40 rounded-[2.5rem] border border-slate-800/60 shadow-2xl overflow-hidden backdrop-blur-sm">
+        
+        <header class="p-6 md:px-10 border-b border-slate-800/60 flex flex-col md:flex-row justify-between items-center gap-6">
+            <div class="flex items-center gap-4">
+                <div class="px-5 py-2.5 bg-indigo-600 rounded-xl skew-x-[-12deg] shadow-lg shadow-indigo-500/20">
+                    <h1 class="text-xs font-black uppercase tracking-[0.2em] text-white skew-x-[12deg]">Book House</h1>
+                </div>
+                <div class="h-6 w-[1px] bg-slate-800 hidden md:block"></div>
+                
+                <button id="filterAuthorized" class="flex items-center gap-3 px-4 py-2 bg-slate-950/50 rounded-xl border border-slate-800 hover:border-indigo-500/50 transition-all group">
+                    <div id="filterStatus" class="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
+                    <span id="filterText" class="text-[9px] font-black font-mono text-slate-400 uppercase tracking-widest group-hover:text-white">Access_My_Vault</span>
+                </button>
+            </div>
+
+            <div class="flex items-center gap-6">
+                <div class="relative group hidden sm:block">
+                    <input type="text" id="bookSearch" placeholder="SEARCH_DATABASE..." 
+                           class="bg-slate-950/50 border border-slate-800 rounded-xl px-10 py-2 text-[10px] font-mono tracking-widest text-white outline-none focus:border-indigo-500/50 transition-all w-64">
+                    <svg class="w-3.5 h-3.5 absolute left-3.5 top-2.5 text-slate-600 group-focus-within:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                </div>
+
+                <a href="/auth/logout" class="group flex items-center gap-3">
+                    <span class="text-[9px] font-black uppercase tracking-[0.3em] text-slate-500 group-hover:text-rose-500 transition-colors">Logout</span>
+                    <div class="w-10 h-10 rounded-xl bg-slate-950 border border-slate-800 flex items-center justify-center group-hover:border-rose-500/50 transition-all">
+                        <svg class="w-4 h-4 text-slate-500 group-hover:text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 16l4-4m0 0l-4-4m4 4H7"/></svg>
+                    </div>
+                </a>
+            </div>
+        </header>
+
+        <main class="flex flex-col lg:flex-row">
+            <aside class="w-full lg:w-96 p-10 border-b lg:border-b-0 lg:border-r border-slate-800/60 bg-slate-900/20">
+                <div class="sticky top-10">
+                    <div class="mb-12">
+                        <p class="text-[9px] font-black text-indigo-500 uppercase tracking-[0.4em] mb-4">Authorized Operator</p>
+                        <h2 class="text-3xl font-black text-white leading-tight tracking-tighter break-words uppercase">
+                            <%= user %>
+                        </h2>
+                    </div>
+
+                    <div class="p-6 bg-slate-950/40 rounded-3xl border border-slate-800/50">
+                        <h4 class="text-[8px] font-black uppercase tracking-[0.3em] text-slate-500 mb-4">Registry_Stats</h4>
+                        <div class="space-y-4">
+                            <div class="flex justify-between items-center">
+                                <span class="text-[10px] text-slate-400">Database Assets</span>
+                                <span class="text-xs font-mono font-bold text-white"><%= books.length %></span>
+                            </div>
+                            <div class="w-full h-[1px] bg-slate-800"></div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-[10px] text-slate-400">Nodes Visible</span>
+                                <span id="matchCount" class="text-xs font-mono font-bold text-indigo-400"><%= books.length %></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <section class="flex-1 p-6 md:p-12">
+                <div id="booksGrid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+                    <% if(books.length > 0) { %>
+                        <% books.forEach((book) => { %>
+                            <% 
+                                // FIX: Ensure both are converted to strings for a clean comparison
+                                const bookOwnerId = book.issuedTo ? String(book.issuedTo) : null;
+                                const sessionUserId = String(currentUserId);
+                                const isOwner = book.status === 'Issued' && bookOwnerId === sessionUserId; 
+                            %>
+                            
+                            <div class="book-card group bg-slate-900/40 border border-slate-800 hover:border-indigo-500/40 rounded-[2.5rem] transition-all duration-500 flex flex-col p-6 relative overflow-hidden" 
+                                 data-status="<%= book.status %>"
+                                 data-owner="<%= isOwner %>">
+                                
+                                <div class="flex justify-between items-center mb-6">
+                                    <span class="px-3 py-1 bg-slate-950 border border-slate-800 rounded-lg text-[9px] font-mono text-indigo-400 uppercase tracking-widest">
+                                        Vol: <%= book.pages %>_Pages
+                                    </span>
+                                    <% if (isOwner) { %>
+                                        <div class="flex items-center gap-1.5 px-3 py-1 bg-indigo-500/10 border border-indigo-500/20 rounded-lg">
+                                            <div class="w-1 h-1 rounded-full bg-indigo-400 animate-pulse"></div>
+                                            <span class="text-[8px] font-black text-indigo-400 uppercase tracking-widest">In_Your_Vault</span>
+                                        </div>
+                                    <% } else if (book.status === 'Issued' || book.status === 'Requested') { %>
+                                        <span class="text-[8px] font-black text-rose-500/50 uppercase tracking-widest">Locked_By_User</span>
+                                    <% } else { %>
+                                        <span class="text-[8px] font-black text-slate-600 uppercase tracking-widest">ID: <%= book.serialNumber %></span>
+                                    <% } %>
+                                </div>
+
+                                <div class="relative aspect-[4/3] rounded-2xl overflow-hidden mb-6 shadow-2xl">
+                                    <img src="/uploads/<%= book.image %>" class="w-full h-full object-cover transition-all duration-700 group-hover:scale-110">
+                                    <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 to-transparent"></div>
+                                </div>
+
+                                <div class="flex-grow space-y-4">
+                                    <h3 class="book-title text-xl font-black text-white group-hover:text-indigo-400 transition-colors uppercase tracking-tight">
+                                        <%= book.title %>
+                                    </h3>
+                                    <p class="book-author text-[10px] font-mono text-slate-500 mt-1 uppercase">// Source: <%= book.author %></p>
+                                    
+                                    <div class="bg-slate-950/30 p-4 rounded-xl border border-slate-800/40">
+                                        <p class="text-xs text-slate-400 leading-relaxed font-medium">
+                                            <%= book.description.substring(0, 80) %>...
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div class="mt-8">
+                                    <% if (book.status === 'Available') { %>
+                                        <form action="/issue/<%= book._id %>" method="POST">
+                                            <button type="submit" class="w-full py-4 bg-white text-black text-[10px] font-black uppercase tracking-widest rounded-2xl hover:bg-indigo-600 hover:text-white transition-all transform active:scale-95 shadow-lg">
+                                                Issued
+                                            </button>
+                                        </form>
+                                    <% } else if (isOwner) { %>
+                                        <a href="/read/<%= book._id %>" class="block w-full py-4 bg-indigo-600 text-white text-[10px] font-black uppercase tracking-widest rounded-2xl text-center shadow-lg shadow-indigo-600/30 hover:bg-indigo-500 transition-all transform hover:-translate-y-1">
+                                            Read_Book
+                                        </a>
+                                    <% } else { %>
+                                        <div class="w-full py-4 bg-slate-800/20 text-slate-700 text-[10px] font-black uppercase tracking-widest rounded-2xl text-center border border-slate-800/50">
+                                            Access_Denied
+                                        </div>
+                                    <% } %>
+                                </div>
+                            </div>
+                        <% }) %>
+                    <% } %>
+                </div>
+
+                <div id="noResults" class="hidden py-32 text-center">
+                    <div class="inline-block p-6 rounded-full bg-slate-900 border border-slate-800 mb-6">
+                        <svg class="w-8 h-8 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                    </div>
+                    <p class="text-[10px] font-black uppercase tracking-[0.5em] text-slate-600">No_Authorized_Assets // Vault_Empty</p>
+                </div>
+            </section>
+        </main>
+    </div>
+</div>
+
+<script>
+    const searchInput = document.getElementById('bookSearch');
+    const filterBtn = document.getElementById('filterAuthorized');
+    const filterText = document.getElementById('filterText');
+    const filterStatus = document.getElementById('filterStatus');
+    const bookCards = document.querySelectorAll('.book-card');
+    const noResults = document.getElementById('noResults');
+    const matchCount = document.getElementById('matchCount');
+
+    let showOnlyAuthorized = false;
+
+    function applyFilters() {
+        const term = searchInput.value.toLowerCase().trim();
+        let visibleCount = 0;
+
+        bookCards.forEach(card => {
+            const title = card.querySelector('.book-title').innerText.toLowerCase();
+            const author = card.querySelector('.book-author').innerText.toLowerCase();
+            const isOwner = card.getAttribute('data-owner') === 'true';
+            
+            const matchesSearch = title.includes(term) || author.includes(term);
+            const matchesVaultFilter = !showOnlyAuthorized || isOwner;
+
+            if (matchesSearch && matchesVaultFilter) {
+                card.style.display = 'flex';
+                visibleCount++;
+            } else {
+                card.style.display = 'none';
+            }
+        });
+
+        matchCount.innerText = visibleCount;
+        noResults.classList.toggle('hidden', visibleCount > 0);
+    }
+
+    filterBtn.addEventListener('click', () => {
+        showOnlyAuthorized = !showOnlyAuthorized;
+        
+        if (showOnlyAuthorized) {
+            filterText.innerText = "VIEWING_MY_AUTHORIZED_ONLY";
+            filterStatus.classList.replace('bg-emerald-500', 'bg-indigo-500');
+            filterBtn.classList.add('border-indigo-500/50', 'bg-indigo-500/5');
+        } else {
+            filterText.innerText = "Access_My_Vault";
+            filterStatus.classList.replace('bg-indigo-500', 'bg-emerald-500');
+            filterBtn.classList.remove('border-indigo-500/50', 'bg-indigo-500/5');
+        }
+        
+        applyFilters();
+    });
+
+    searchInput.addEventListener('input', applyFilters);
+</script>

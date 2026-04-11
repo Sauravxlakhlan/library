@@ -1,0 +1,83 @@
+<%- include('../partials/head') %>
+
+<div class="min-h-screen flex items-center justify-center bg-[#0F172A] font-sans antialiased text-slate-300 selection:bg-indigo-500/30 overflow-hidden relative py-12">
+    
+    <div class="absolute top-[-10%] right-[-10%] w-[40%] h-[40%] bg-indigo-600/10 rounded-full blur-[120px]"></div>
+    <div class="absolute bottom-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-600/5 rounded-full blur-[120px]"></div>
+
+    <div class="max-w-xl w-full mx-4 relative">
+        <div class="text-center mb-8">
+            <h2 class="text-xs font-black uppercase tracking-[0.5em] text-white">Library Access <span class="text-slate-500">Registry</span></h2>
+            <p class="text-[9px] font-mono text-slate-600 mt-3 uppercase tracking-widest">Protocol: Node_Initialization_v4.5</p>
+        </div>
+
+        <div class="bg-[#1E293B] p-10 rounded-[32px] border border-slate-800 shadow-2xl relative">
+            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-indigo-500/50 to-transparent"></div>
+
+            <form class="space-y-6" action="/auth/signup" method="POST" enctype="multipart/form-data">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    
+                    <div class="group md:col-span-2">
+                        <label class="block text-[9px] font-black text-slate-500 uppercase tracking-widest mb-2 group-focus-within:text-indigo-400 transition-colors">Legal Identity (Full Name)</label>
+                        <input name="name" type="text" required 
+                               class="w-full px-5 py-3.5 bg-slate-900/50 border border-slate-800 rounded-xl text-white font-medium placeholder:text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all" 
+                               placeholder="Enter full name">
+                    </div>
+
+                    <div class="group md:col-span-2">
+                        <label class="block text-[9px] font-black text-slate-500 uppercase tracking-widest mb-2 group-focus-within:text-indigo-400 transition-colors">Network Identifier (Email)</label>
+                        <input name="email" type="email" required 
+                               class="w-full px-5 py-3.5 bg-slate-900/50 border border-slate-800 rounded-xl text-white font-mono placeholder:text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all" 
+                               placeholder="name@institution.com">
+                    </div>
+
+                    <div class="group">
+                        <label class="block text-[9px] font-black text-slate-500 uppercase tracking-widest mb-2 group-focus-within:text-indigo-400 transition-colors">Access Key</label>
+                        <input name="password" type="password" required 
+                               class="w-full px-5 py-3.5 bg-slate-900/50 border border-slate-800 rounded-xl text-white font-mono placeholder:text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all" 
+                               placeholder="••••••••">
+                    </div>
+
+                    <div class="group">
+                        <label class="block text-[9px] font-black text-slate-500 uppercase tracking-widest mb-2 group-focus-within:text-indigo-400 transition-colors">Clearance Level</label>
+                        <select name="role" class="w-full px-5 py-3.5 bg-slate-900 border border-slate-800 rounded-xl text-slate-300 font-black text-[10px] uppercase tracking-widest focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all appearance-none cursor-pointer">
+                            <option value="student">Student Node</option>
+                            <option value="admin">System Admin</option>
+                        </select>
+                    </div>
+
+                    <div class="md:col-span-2 group">
+                        <label class="block text-[9px] font-black text-slate-500 uppercase tracking-widest mb-2 group-focus-within:text-indigo-400 transition-colors">Biometric Verification (Profile Image)</label>
+                        <div class="relative flex items-center justify-center w-full">
+                            <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-slate-800 border-dashed rounded-2xl cursor-pointer bg-slate-900/30 hover:bg-slate-900/60 hover:border-indigo-500/50 transition-all">
+                                <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                                    <svg class="w-6 h-6 mb-2 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                                    <p class="text-[8px] font-black text-slate-500 uppercase tracking-[0.2em]">Upload Metadata Image</p>
+                                </div>
+                                <input name="profileImage" type="file" accept="image/*" class="hidden" />
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pt-4">
+                    <button type="submit" class="w-full bg-indigo-600 hover:bg-white text-white hover:text-black font-black py-4 rounded-xl shadow-lg shadow-indigo-900/20 transition-all duration-300 transform active:scale-[0.98] uppercase tracking-[0.3em] text-[10px]">
+                        Initialize Registration
+                    </button>
+                </div>
+            </form>
+
+            <div class="mt-8 text-center">
+                <a href="/auth/login" class="text-[9px] font-black uppercase tracking-widest text-slate-500 hover:text-indigo-400 transition-colors">
+                    Existing Node? Return to Gateway
+                </a>
+            </div>
+        </div>
+
+        <div class="mt-8 text-center opacity-20">
+            <p class="text-[8px] font-black uppercase tracking-[0.4em] text-slate-400">
+                Lumina Institutional Core • Protocol Active
+            </p>
+        </div>
+    </div>
+</div>

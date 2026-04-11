@@ -1,0 +1,156 @@
+<%- include('../partials/head') %>
+
+<div class="min-h-screen bg-[#0F172A] font-sans antialiased text-slate-300 selection:bg-indigo-500/30">
+    <nav class="border-b border-slate-800 bg-[#0F172A]/80 backdrop-blur-md sticky top-0 z-50">
+        <div class="max-w-[1600px] mx-auto px-8 h-14 flex justify-between items-center">
+            <div class="flex items-center gap-6">
+                <div class="flex items-center gap-2">
+                    <div class="w-2 h-6 bg-indigo-500 rounded-full"></div>
+                    <h1 class="text-[10px] font-black uppercase tracking-[0.3em] text-white">Library Management<span class="text-slate-500"></span></h1>
+                </div>
+                <div class="hidden md:flex gap-6 border-l border-slate-800 pl-6 text-[10px] font-bold uppercase tracking-widest">
+                    <a href="/admin/dashboard" class="text-slate-500 hover:text-slate-300 transition-colors">Registry</a>
+                    <span class="text-indigo-400">Directory</span>
+                    <a href="/admin/add-book" class="text-slate-500 hover:text-slate-300 transition-colors">Assets</a>
+                </div>
+            </div>
+
+            <a href="/auth/logout" class="text-[9px] font-black uppercase tracking-widest px-4 py-1.5 rounded-md border border-slate-800 hover:bg-rose-500/10 hover:text-rose-400 hover:border-rose-500/50 transition-all">
+                Logout
+            </a>
+        </div>
+    </nav>
+
+    <main class="max-w-[1600px] mx-auto p-10">
+        <div class="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-8 mb-12">
+            <div>
+                <h2 class="text-5xl font-black text-white tracking-tighter mb-2 uppercase">Personal Index</h2>
+                <div class="flex gap-4 items-center">
+                    <p class="text-slate-500 text-[10px] font-black uppercase tracking-[0.3em]">Authorized Entities:</p>
+                    <span class="bg-indigo-500/10 text-indigo-400 px-3 py-0.5 rounded text-[10px] font-black border border-indigo-500/20">
+                        <span id="nodeCount"><%= students.length %></span> Verified Nodes
+                    </span>
+                </div>
+            </div>
+
+            <div class="relative group w-full lg:w-96">
+                <input type="text" id="directorySearch" placeholder="QUERY DIRECTORY..." 
+                       class="w-full bg-slate-900 border border-slate-700 rounded-xl px-12 py-4 text-[11px] font-mono font-bold tracking-widest text-white outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-inner placeholder:text-slate-600">
+                <svg class="w-4 h-4 absolute left-4 top-4 text-slate-500 group-focus-within:text-indigo-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+            </div>
+        </div>
+
+        <div class="bg-[#1E293B] rounded-2xl border border-slate-800 shadow-2xl overflow-hidden">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-slate-900/50 text-slate-500 uppercase text-[9px] font-black tracking-[0.2em] border-b border-slate-800">
+                        <th class="px-10 py-6">Entity Profile</th>
+                        <th class="px-10 py-6">Comms Protocol (Email)</th>
+                        <th class="px-10 py-6">Validation Status</th>
+                        <th class="px-10 py-6 text-right">Access Link</th>
+                    </tr>
+                </thead>
+                <tbody id="studentTableBody" class="divide-y divide-slate-800/50">
+                    <% if(students.length > 0) { %>
+                        <% students.forEach(student => { %>
+                            <tr class="group hover:bg-slate-800/40 transition-all student-row">
+                                <td class="px-10 py-6">
+                                    <div class="flex items-center gap-5">
+                                        <div class="relative">
+                                            <img src="/uploads/<%= student.profileImage %>" 
+                                                 onerror="this.src='/images/default-user.png'"
+                                                 class="w-12 h-12 rounded-xl object-cover border border-slate-700 shadow-xl group-hover:border-indigo-500/50 transition-all duration-300">
+                                            <div class="absolute -bottom-1 -right-1 w-3.5 h-3.5 bg-slate-900 border border-slate-700 rounded flex items-center justify-center">
+                                                <div class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <p class="font-bold text-slate-100 text-sm tracking-tight group-hover:text-indigo-400 transition-colors student-name"><%= student.name %></p>
+                                            <p class="text-[9px] font-mono text-slate-500 mt-1 uppercase tracking-widest">HEX_ID: <%= student._id.toString().slice(-8) %></p>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                <td class="px-10 py-6">
+                                    <span class="text-xs font-mono text-slate-400 group-hover:text-slate-200 transition-colors student-email">
+                                        <%= student.email %>
+                                    </span>
+                                </td>
+
+                                <td class="px-10 py-6">
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded bg-indigo-500/5 border border-indigo-500/20 text-indigo-400">
+                                            Clearance Verified
+                                        </span>
+                                    </div>
+                                </td>
+
+                                <td class="px-10 py-6 text-right">
+                                    <a href="/admin/students/<%= student._id %>" 
+                                       class="inline-flex items-center gap-2 bg-slate-900 border border-slate-700 text-slate-300 text-[9px] font-black px-5 py-2 rounded-lg hover:bg-white hover:text-black hover:border-white transition-all uppercase tracking-widest">
+                                        Inspect Profile
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                                    </a>
+                                </td>
+                            </tr>
+                        <% }) %>
+                    <% } else { %>
+                        <tr>
+                            <td colspan="4" class="p-32 text-center">
+                                <p class="text-slate-700 font-black uppercase tracking-[0.5em] text-xs">Directory Null • No Nodes Detected</p>
+                            </td>
+                        </tr>
+                    <% } %>
+                    <tr id="noMatchesRow" style="display: none;">
+                        <td colspan="4" class="p-32 text-center">
+                            <p class="text-slate-700 font-black uppercase tracking-[0.5em] text-xs">Query Null • No Matching Entities Found</p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <footer class="mt-20 py-10 border-t border-slate-800/50">
+        <div class="max-w-[1600px] mx-auto px-10 flex justify-between items-center opacity-30">
+            <p class="text-[9px] font-black uppercase tracking-[0.3em] text-slate-400">Institutional OS v4.51</p>
+            <div class="flex gap-4">
+                <div class="w-1 h-1 rounded-full bg-slate-500"></div>
+                <div class="w-1.5 h-1.5 rounded-full bg-indigo-500"></div>
+                <div class="w-1 h-1 rounded-full bg-slate-500"></div>
+            </div>
+        </div>
+    </footer>
+</div>
+
+<script>
+    document.getElementById('directorySearch').addEventListener('input', function(e) {
+        const query = e.target.value.toLowerCase();
+        const rows = document.querySelectorAll('.student-row');
+        const noMatchesRow = document.getElementById('noMatchesRow');
+        const nodeCount = document.getElementById('nodeCount');
+        let visibleCount = 0;
+
+        rows.forEach(row => {
+            const name = row.querySelector('.student-name').textContent.toLowerCase();
+            const email = row.querySelector('.student-email').textContent.toLowerCase();
+            
+            if (name.includes(query) || email.includes(query)) {
+                row.style.display = "";
+                visibleCount++;
+            } else {
+                row.style.display = "none";
+            }
+        });
+
+        // Update the counter in the header
+        nodeCount.textContent = visibleCount;
+
+        // Show/Hide "No Matching Entities" message
+        if (visibleCount === 0 && query !== "") {
+            noMatchesRow.style.display = "";
+        } else {
+            noMatchesRow.style.display = "none";
+        }
+    });
+</script>

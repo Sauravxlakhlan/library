@@ -1,0 +1,212 @@
+<%- include('../partials/head') %>
+
+<div class="min-h-screen bg-[#0F172A] font-sans antialiased text-slate-300 selection:bg-indigo-500/30">
+    <nav class="border-b border-slate-800 bg-[#0F172A]/80 backdrop-blur-md sticky top-0 z-50">
+        <div class="max-w-[1600px] mx-auto px-8 h-14 flex justify-between items-center">
+            <div class="flex items-center gap-6">
+                <div class="flex items-center gap-2">
+                    <div class="w-2 h-6 bg-indigo-500 rounded-full"></div>
+                    <h1 class="text-[10px] font-black uppercase tracking-[0.3em] text-white">Library Management</h1>
+                </div>
+                <div class="hidden md:flex gap-6 border-l border-slate-800 pl-6">
+                    <a href="/admin/dashboard" class="text-[10px] font-bold uppercase tracking-widest text-indigo-400">Registry</a>
+                    <a href="/admin/students" class="text-[10px] font-bold uppercase tracking-widest text-slate-500 hover:text-slate-300 transition-colors">Directory</a>
+                    <a href="/admin/add-book" class="text-[10px] font-bold uppercase tracking-widest text-slate-500 hover:text-slate-300 transition-colors">Assets</a>
+                </div>
+            </div>
+
+            <a href="/auth/logout" class="text-[9px] font-black uppercase tracking-widest px-4 py-1.5 rounded-md border border-slate-800 hover:bg-rose-500/10 hover:text-rose-400 hover:border-rose-500/50 transition-all">
+                Logout
+            </a>
+        </div>
+    </nav>
+
+    <main class="max-w-[1600px] mx-auto p-10">
+        <div class="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-8 mb-12">
+            <div>
+                <h2 class="text-5xl font-black text-white tracking-tighter mb-2 uppercase">Registry Control</h2>
+                <div class="flex gap-4 items-center">
+                    <p class="text-slate-500 text-xs font-medium uppercase tracking-widest">Active Circulation Nodes:</p>
+                    <span class="bg-indigo-500/10 text-indigo-400 px-3 py-0.5 rounded text-[10px] font-black border border-indigo-500/20">
+                        <span id="activeCount"><%= issues.length %></span> Entries
+                    </span>
+                </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row gap-4 w-full lg:w-auto">
+                <div class="relative group w-full sm:w-80">
+                    <input type="text" id="registrySearch" placeholder="SEARCH ASSET, USER, OR ID..." 
+                           class="w-full bg-slate-900 border border-slate-700 rounded-xl px-12 py-3 text-[10px] font-mono font-bold tracking-widest text-white outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all placeholder:text-slate-600 uppercase">
+                    <svg class="w-4 h-4 absolute left-4 top-3 text-slate-500 group-focus-within:text-indigo-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                </div>
+                
+                <a href="/admin/add-book" class="bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-3 rounded-xl font-bold text-[11px] uppercase tracking-widest shadow-lg shadow-indigo-500/20 transition-all flex items-center justify-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4"/></svg>
+                    New Allocation
+                </a>
+            </div>
+        </div>
+
+        <div class="bg-[#1E293B] rounded-2xl border border-slate-800 shadow-2xl overflow-hidden">
+            <table class="w-full text-left border-collapse" id="registryTable">
+                <thead>
+                    <tr class="bg-slate-900/50 text-slate-500 uppercase text-[9px] font-black tracking-[0.2em] border-b border-slate-800">
+                        <th class="px-8 py-5">Asset Intelligence</th>
+                        <th class="px-8 py-5">Assigned End-User</th>
+                        <th class="px-8 py-5">Process Status</th>
+                        <th class="px-8 py-5">Timeline Log</th>
+                        <th class="px-8 py-5">Financial Ledger</th>
+                        <th class="px-8 py-5 text-right">Operations</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-800/50" id="registryBody">
+                    <% if(issues.length > 0) { %>
+                        <% issues.forEach(issue => { %>
+                            <tr class="issue-row group hover:bg-slate-800/30 transition-all">
+                                <td class="px-8 py-6">
+                                    <div class="flex items-center gap-5">
+                                        <div class="relative">
+                                            <img src="/uploads/<%= issue.bookImage %>" onerror="this.src='/images/default-book.png'" 
+                                                 class="w-10 h-14 object-cover rounded-lg shadow-2xl border border-slate-700">
+                                            <div class="absolute -bottom-1 -right-1 w-4 h-4 bg-slate-900 border border-slate-700 rounded flex items-center justify-center">
+                                                <div class="w-1.5 h-1.5 rounded-full <%= issue.status === 'Approved' ? 'bg-indigo-500 animate-pulse' : (issue.status === 'Rejected' ? 'bg-rose-500' : 'bg-slate-600') %>"></div>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <p class="book-title font-bold text-slate-100 text-sm tracking-tight group-hover:text-indigo-400 transition-colors"><%= issue.bookTitle %></p>
+                                            <p class="book-id text-[9px] font-mono text-slate-500 mt-1 uppercase tracking-widest">ID: <%= issue.serialNumber %></p>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                <td class="px-8 py-6">
+                                    <div class="flex items-center gap-3">
+                                        <img src="/uploads/<%= issue.studentImage %>" onerror="this.src='/images/default-user.png'" 
+                                             class="w-8 h-8 rounded-full border border-slate-700 opacity-80 group-hover:opacity-100 transition-opacity">
+                                        <div>
+                                            <p class="student-name text-xs font-bold text-slate-200"><%= issue.userName %></p>
+                                            <p class="text-[10px] text-slate-500 font-medium lowercase"><%= issue.userEmail %></p>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                <td class="px-8 py-6">
+                                    <% if(issue.status === 'Pending') { %>
+                                        <span class="text-amber-500/80 text-[9px] font-black uppercase tracking-widest px-2 py-1 rounded bg-amber-500/5 border border-amber-500/20">Pending Sync</span>
+                                    <% } else if(issue.status === 'Approved') { %>
+                                        <span class="text-indigo-400 text-[9px] font-black uppercase tracking-widest px-2 py-1 rounded bg-indigo-500/5 border border-indigo-500/20">Active Loan</span>
+                                    <% } else if(issue.status === 'Rejected') { %>
+                                        <span class="text-rose-500 text-[9px] font-black uppercase tracking-widest px-2 py-1 rounded bg-rose-500/5 border border-rose-500/20">Access Denied</span>
+                                    <% } else { %>
+                                        <span class="text-slate-500 text-[9px] font-black uppercase tracking-widest">Archived Ledger</span>
+                                    <% } %>
+                                </td>
+
+                                <td class="px-8 py-6">
+                                    <div class="text-[10px] font-mono space-y-1">
+                                        <% if(issue.status === 'Approved') { %>
+                                            <p class="text-slate-500">ISSUED: <span class="text-slate-300"><%= issue.issueDateStr %></span></p>
+                                            <p class="<%= issue.fine > 0 ? 'text-rose-500' : 'text-indigo-400' %>">EXPIRY: <%= issue.dueDateStr %></p>
+                                        <% } else if(issue.status === 'Returned') { %>
+                                            <p class="text-slate-600">CLOSED: <%= new Date(issue.returnDate).toLocaleDateString() %></p>
+                                        <% } else if(issue.status === 'Rejected') { %>
+                                            <p class="text-rose-900/50">VOIDED: <%= new Date().toLocaleDateString() %></p>
+                                        <% } else { %>
+                                            <p class="text-slate-500">REQ: <%= issue.requestDateStr %></p>
+                                        <% } %>
+                                    </div>
+                                </td>
+
+                                <td class="px-8 py-6">
+                                    <div class="font-mono">
+                                        <% if(issue.fine > 0) { %>
+                                            <span class="text-rose-500 text-xs font-bold">₹<%= issue.fine %></span>
+                                            <p class="text-[8px] text-rose-500/50 uppercase font-black tracking-tighter">Penalty Unpaid</p>
+                                        <% } else { %>
+                                            <span class="text-emerald-500/60 text-xs font-bold">Clearance</span>
+                                        <% } %>
+                                    </div>
+                                </td>
+
+                                <td class="px-8 py-6 text-right">
+                                    <div class="flex justify-end gap-2">
+                                        <% if(issue.status === 'Pending') { %>
+                                            <div class="flex gap-2">
+                                                <form action="/admin/approve/<%= issue._id %>" method="POST">
+                                                    <button class="bg-indigo-600 hover:bg-white hover:text-black text-white text-[9px] font-black px-4 py-1.5 rounded uppercase tracking-widest transition-all shadow-lg shadow-indigo-600/10">Authorize</button>
+                                                </form>
+                                                <form action="/admin/reject/<%= issue._id %>" method="POST" onsubmit="return confirm('DENY ALLOCATION REQUEST?')">
+                                                    <button class="bg-slate-900 border border-rose-900/50 text-rose-500 hover:bg-rose-600 hover:text-white text-[9px] font-black px-4 py-1.5 rounded uppercase tracking-widest transition-all">Deny</button>
+                                                </form>
+                                            </div>
+                                        <% } else if(issue.status === 'Approved') { %>
+                                            <form action="/admin/return/<%= issue._id %>" method="POST">
+                                                <button class="bg-slate-900 border border-slate-700 text-slate-300 hover:bg-rose-600 hover:text-white hover:border-rose-600 text-[9px] font-black px-4 py-1.5 rounded uppercase tracking-widest transition-all">Settle</button>
+                                            </form>
+                                        <% } else if(issue.status === 'Rejected') { %>
+                                            <div class="text-rose-500/20 text-[9px] font-black uppercase tracking-[0.2em] flex items-center gap-1">
+                                                Voided <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" stroke-width="3" stroke-linecap="round"/></svg>
+                                            </div>
+                                        <% } else { %>
+                                            <div class="text-emerald-500/40 text-[9px] font-black uppercase tracking-[0.2em] flex items-center gap-1">
+                                                Logged <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/></svg>
+                                            </div>
+                                        <% } %>
+                                    </div>
+                                </td>
+                            </tr>
+                        <% }) %>
+                    <% } %>
+                    <tr id="noResultsRow" style="display: none;">
+                        <td colspan="6" class="p-32 text-center text-slate-700 font-black uppercase tracking-[0.4em] text-xs">
+                            Query Null • No Matching Nodes Found
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <footer class="mt-20 py-10 border-t border-slate-800/50">
+        <div class="max-w-[1600px] mx-auto px-10 flex justify-between items-center opacity-30">
+            <p class="text-[9px] font-black uppercase tracking-[0.3em] text-slate-400">Institutional OS v4.51</p>
+            <div class="flex gap-4">
+                <div class="w-1 h-1 rounded-full bg-slate-500"></div>
+                <div class="w-1 h-1 rounded-full bg-slate-500"></div>
+                <div class="w-1 h-1 rounded-full bg-slate-500"></div>
+            </div>
+        </div>
+    </footer>
+</div>
+
+<script>
+    // Search Functionality Logic
+    document.getElementById('registrySearch').addEventListener('input', function(e) {
+        const query = e.target.value.toLowerCase().trim();
+        const rows = document.querySelectorAll('.issue-row');
+        const noResultsRow = document.getElementById('noResultsRow');
+        const activeCountDisplay = document.getElementById('activeCount');
+        let visibleCount = 0;
+
+        rows.forEach(row => {
+            const bookTitle = row.querySelector('.book-title').textContent.toLowerCase();
+            const bookID = row.querySelector('.book-id').textContent.toLowerCase();
+            const studentName = row.querySelector('.student-name').textContent.toLowerCase();
+
+            if (bookTitle.includes(query) || bookID.includes(query) || studentName.includes(query)) {
+                row.style.display = "";
+                visibleCount++;
+            } else {
+                row.style.display = "none";
+            }
+        });
+
+        activeCountDisplay.textContent = visibleCount;
+
+        if (visibleCount === 0) {
+            noResultsRow.style.display = "table-row";
+        } else {
+            noResultsRow.style.display = "none";
+        }
+    });
+</script>
