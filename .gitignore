@@ -1,71 +1,95 @@
 # =========================
-# System / Environment (CRITICAL)
-# =========================
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-# Never track your secret environment variables
-!.env.example
-
-# =========================
-# Node.js
+# Node.js / Express
 # =========================
 node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
-.npm
-.eslintcache
 
-# =========================
-# Library System Specifics (Uploads)
-# =========================
-# Ignore actual book/user images to keep the repo small
-public/uploads/*
-# Allow the folder to exist but stay empty on GitHub
-!public/uploads/.gitkeep
+# Environment variables
+.env
+.env.*
+!.env.example
 
-# Express-session file store (if used)
-sessions/
-
-# =========================
-# Database (MongoDB)
-# =========================
-*.mongod.lock
-*.mongo
-*.db
-*.sqlite
-*.sqlite3
-
-# =========================
-# IDE / OS Files
-# =========================
-.vscode/
-.idea/
-*.swp
-*.swo
-.DS_Store
-Thumbs.db
-
-# =========================
-# Logs and Runtime
-# =========================
+# Logs
 logs/
 *.log
+
+# Runtime data
 pids/
 *.pid
 *.seed
 *.pid.lock
 
-# =========================
-# Build / Coverage
-# =========================
+# Coverage
+coverage/
+.nyc_output/
+
+# Build outputs
 dist/
 build/
 out/
-coverage/
-.nyc_output/
+
+# Dependency directories
+jspm_packages/
+
+# Optional npm cache
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# =========================
+# Frontend (React/Vue/etc.)
+# =========================
+node_modules/
+build/
+dist/
+.cache/
+.next/
+.nuxt/
+.svelte-kit/
+.vite/
+
+# Static files (if generated)
+public/build/
+
+# =========================
+# OS / System files
+# =========================
+.DS_Store
+Thumbs.db
+
+# =========================
+# IDE / Editor files
+# =========================
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# =========================
+# TypeScript
+# =========================
 *.tsbuildinfo
+
+# =========================
+# Docker (optional)
+# =========================
+.dockerignore
+
+# =========================
+# Database files (if local)
+# =========================
+*.sqlite
+*.sqlite3
+*.db
+
+# =========================
+# Misc
+# =========================
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
