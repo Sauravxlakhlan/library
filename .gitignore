@@ -1,95 +1,71 @@
 # =========================
-# Node.js / Express
+# System / Environment (CRITICAL)
+# =========================
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+# Never track your secret environment variables
+!.env.example
+
+# =========================
+# Node.js
 # =========================
 node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
-
-# Environment variables
-.env
-.env.*
-!.env.example
-
-# Logs
-logs/
-*.log
-
-# Runtime data
-pids/
-*.pid
-*.seed
-*.pid.lock
-
-# Coverage
-coverage/
-.nyc_output/
-
-# Build outputs
-dist/
-build/
-out/
-
-# Dependency directories
-jspm_packages/
-
-# Optional npm cache
 .npm
-
-# Optional eslint cache
 .eslintcache
 
 # =========================
-# Frontend (React/Vue/etc.)
+# Library System Specifics (Uploads)
 # =========================
-node_modules/
-build/
-dist/
-.cache/
-.next/
-.nuxt/
-.svelte-kit/
-.vite/
+# Ignore actual book/user images to keep the repo small
+public/uploads/*
+# Allow the folder to exist but stay empty on GitHub
+!public/uploads/.gitkeep
 
-# Static files (if generated)
-public/build/
+# Express-session file store (if used)
+sessions/
 
 # =========================
-# OS / System files
+# Database (MongoDB)
 # =========================
-.DS_Store
-Thumbs.db
+*.mongod.lock
+*.mongo
+*.db
+*.sqlite
+*.sqlite3
 
 # =========================
-# IDE / Editor files
+# IDE / OS Files
 # =========================
 .vscode/
 .idea/
 *.swp
 *.swo
+.DS_Store
+Thumbs.db
 
 # =========================
-# TypeScript
+# Logs and Runtime
 # =========================
+logs/
+*.log
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# =========================
+# Build / Coverage
+# =========================
+dist/
+build/
+out/
+coverage/
+.nyc_output/
 *.tsbuildinfo
-
-# =========================
-# Docker (optional)
-# =========================
-.dockerignore
-
-# =========================
-# Database files (if local)
-# =========================
-*.sqlite
-*.sqlite3
-*.db
-
-# =========================
-# Misc
-# =========================
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
