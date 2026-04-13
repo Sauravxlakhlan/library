@@ -11,7 +11,7 @@
                 <div class="hidden md:flex gap-6 border-l border-slate-800 pl-6">
                     <a href="/admin/dashboard" class="text-[10px] font-bold uppercase tracking-widest text-indigo-400">Registry</a>
                     <a href="/admin/students" class="text-[10px] font-bold uppercase tracking-widest text-slate-500 hover:text-slate-300 transition-colors">Directory</a>
-                    <a href="/admin/add-book" class="text-[10px] font-bold uppercase tracking-widest text-slate-500 hover:text-slate-300 transition-colors">Assets</a>
+                    <a href="/admin/books" class="text-[10px] font-bold uppercase tracking-widest text-slate-500 hover:text-slate-300 transition-colors">Assets</a>
                 </div>
             </div>
 
@@ -164,6 +164,20 @@
                     </tr>
                 </tbody>
             </table>
+            
+            <div id="paginationContainer" class="px-8 py-5 bg-slate-900/30 border-t border-slate-800 flex justify-between items-center">
+                <p class="text-[9px] font-mono text-slate-500 uppercase tracking-widest">
+                    Showing <span id="pageRange" class="text-indigo-400">0 - 0</span> of <span id="totalVisibleCount" class="text-slate-300">0</span> nodes
+                </p>
+                <div class="flex gap-2">
+                    <button id="prevBtn" class="px-4 py-2 text-[10px] font-mono font-bold rounded transition-all border bg-slate-900 border-slate-700 text-slate-500 hover:text-white hover:border-slate-500 disabled:opacity-20 disabled:cursor-not-allowed">
+                        Previous
+                    </button>
+                    <button id="nextBtn" class="px-4 py-2 text-[10px] font-mono font-bold rounded transition-all border bg-slate-900 border-slate-700 text-slate-500 hover:text-white hover:border-slate-500 disabled:opacity-20 disabled:cursor-not-allowed">
+                        Next
+                    </button>
+                </div>
+            </div>
         </div>
     </main>
 
@@ -180,33 +194,82 @@
 </div>
 
 <script>
-    // Search Functionality Logic
-    document.getElementById('registrySearch').addEventListener('input', function(e) {
-        const query = e.target.value.toLowerCase().trim();
-        const rows = document.querySelectorAll('.issue-row');
-        const noResultsRow = document.getElementById('noResultsRow');
-        const activeCountDisplay = document.getElementById('activeCount');
-        let visibleCount = 0;
+    const ROWS_PER_PAGE = 5; 
+    let currentPage = 1;
+    let filteredRows = [];
 
-        rows.forEach(row => {
+    const registrySearch = document.getElementById('registrySearch');
+    const allRows = Array.from(document.querySelectorAll('.issue-row'));
+    const noResultsRow = document.getElementById('noResultsRow');
+    const activeCountDisplay = document.getElementById('activeCount');
+    const totalVisibleDisplay = document.getElementById('totalVisibleCount');
+    const pageRangeDisplay = document.getElementById('pageRange');
+    
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+
+    function updatePagination() {
+        const totalRows = filteredRows.length;
+        const totalPages = Math.ceil(totalRows / ROWS_PER_PAGE);
+        
+        if (currentPage > totalPages) currentPage = totalPages || 1;
+
+        const startIdx = (currentPage - 1) * ROWS_PER_PAGE;
+        const endIdx = startIdx + ROWS_PER_PAGE;
+
+        allRows.forEach(row => row.style.display = "none");
+        
+        filteredRows.slice(startIdx, endIdx).forEach(row => {
+            row.style.display = "table-row";
+        });
+
+        // Update Text
+        const rangeStart = totalRows === 0 ? 0 : startIdx + 1;
+        const rangeEnd = Math.min(endIdx, totalRows);
+        pageRangeDisplay.textContent = `${rangeStart} - ${rangeEnd}`;
+        totalVisibleDisplay.textContent = totalRows;
+        activeCountDisplay.textContent = totalRows;
+
+        noResultsRow.style.display = (totalRows === 0) ? "table-row" : "none";
+
+        // Update button states
+        prevBtn.disabled = currentPage === 1;
+        nextBtn.disabled = currentPage >= totalPages || totalRows === 0;
+    }
+
+    prevBtn.addEventListener('click', () => {
+        if (currentPage > 1) {
+            currentPage--;
+            updatePagination();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    });
+
+    nextBtn.addEventListener('click', () => {
+        const totalPages = Math.ceil(filteredRows.length / ROWS_PER_PAGE);
+        if (currentPage < totalPages) {
+            currentPage++;
+            updatePagination();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    });
+
+    // Search Logic
+    registrySearch.addEventListener('input', function(e) {
+        const query = e.target.value.toLowerCase().trim();
+        
+        filteredRows = allRows.filter(row => {
             const bookTitle = row.querySelector('.book-title').textContent.toLowerCase();
             const bookID = row.querySelector('.book-id').textContent.toLowerCase();
             const studentName = row.querySelector('.student-name').textContent.toLowerCase();
-
-            if (bookTitle.includes(query) || bookID.includes(query) || studentName.includes(query)) {
-                row.style.display = "";
-                visibleCount++;
-            } else {
-                row.style.display = "none";
-            }
+            return bookTitle.includes(query) || bookID.includes(query) || studentName.includes(query);
         });
 
-        activeCountDisplay.textContent = visibleCount;
-
-        if (visibleCount === 0) {
-            noResultsRow.style.display = "table-row";
-        } else {
-            noResultsRow.style.display = "none";
-        }
+        currentPage = 1;
+        updatePagination();
     });
+
+    // Initialize on load
+    filteredRows = [...allRows];
+    updatePagination();
 </script>
