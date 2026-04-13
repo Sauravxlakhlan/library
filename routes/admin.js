@@ -29,7 +29,8 @@ router.use(isAdmin);
 router.get('/students', async (req, res) => {
     try {
         const students = await User.find({ role: 'student' });
-        res.render('admin/students', { students });
+        // Added page: 'students' for navbar highlighting
+        res.render('admin/students', { students, page: 'students' });
     } catch (err) {
         console.error(err);
         res.status(500).send("Error fetching student directory");
@@ -45,18 +46,46 @@ router.get('/students/:id', async (req, res) => {
         const history = await Issue.find({ userEmail: student.email }).sort({ requestDate: -1 });
         const totalFine = history.reduce((acc, curr) => acc + (curr.finalFine || 0), 0);
 
-        res.render('admin/student-details', { student, history, totalFine });
+        // Added page: 'students' so the Directory tab stays active
+        res.render('admin/student-details', { student, history, totalFine, page: 'students' });
     } catch (err) {
         console.error(err);
         res.status(500).send("Error loading student profile");
     }
 });
 
-// --- BOOK & DASHBOARD ROUTES ---
+// --- ASSET INVENTORY & STATUS TOGGLE ---
 
-router.get('/add-book', (req, res) => {
-    res.render('admin/add-book'); 
+// GET: View all books in library (books.ejs)
+router.get('/books', async (req, res) => {
+    try {
+        const books = await Book.find().sort({ title: 1 });
+        // Added page: 'books' for navbar highlighting (Assets button)
+        res.render('admin/books', { books, page: 'books' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Error loading asset inventory");
+    }
 });
+
+// POST: Toggle Active/Inactive status
+router.post('/books/toggle-status/:id', async (req, res) => {
+    try {
+        const book = await Book.findById(req.params.id);
+        if (!book) return res.status(404).send("Asset not found");
+
+        // Logic: If Inactive -> Available | If anything else -> Inactive
+        const newStatus = book.status === 'Inactive' ? 'Available' : 'Inactive';
+        
+        await Book.findByIdAndUpdate(req.params.id, { status: newStatus });
+        res.redirect('/admin/books');
+    } catch (err) {
+        console.error("Toggle Error:", err);
+        res.status(500).send("Failed to toggle asset status.");
+    }
+});
+
+// --- DASHBOARD & REGISTRY ROUTES ---
 
 router.get('/dashboard', async (req, res) => {
     try {
@@ -83,7 +112,8 @@ router.get('/dashboard', async (req, res) => {
             };
         });
 
-        res.render('admin/dashboard', { issues: updatedIssues });
+        // Added page: 'dashboard' for navbar highlighting (Registry button)
+        res.render('admin/dashboard', { issues: updatedIssues, page: 'dashboard' });
     } catch (err) {
         console.error(err);
         res.status(500).send("Error loading admin dashboard");
@@ -125,18 +155,16 @@ router.post('/approve/:id', async (req, res) => {
 });
 
 /**
- * REJECT ROUTE (NEW)
+ * REJECT ROUTE
  */
 router.post('/reject/:id', async (req, res) => {
     try {
         const issueRequest = await Issue.findById(req.params.id);
         if (!issueRequest) return res.status(404).send("Request node not found");
 
-        // 1. Mark request as Rejected to preserve audit history
         issueRequest.status = 'Rejected';
         await issueRequest.save();
 
-        // 2. Release Asset: Set book status back to Available
         await Book.findByIdAndUpdate(issueRequest.bookId, { 
             status: 'Available',
             issuedTo: null 
@@ -185,6 +213,11 @@ router.post('/return/:id', async (req, res) => {
 
 // --- ASSET CREATION ---
 
+router.get('/add-book', (req, res) => {
+    // Passes page: 'books' so the Assets tab is highlighted while adding
+    res.render('admin/add-book', { page: 'books' }); 
+});
+
 router.post('/add-book', upload.single('bookImage'), async (req, res) => {
     try {
         const { title, author, serialNumber, description, pages } = req.body;
@@ -195,7 +228,7 @@ router.post('/add-book', upload.single('bookImage'), async (req, res) => {
             status: 'Available' 
         });
 
-        res.redirect('/admin/dashboard');
+        res.redirect('/admin/books'); 
     } catch (err) {
         if (err.code === 11000) return res.status(400).send("Error: Serial Number must be unique.");
         res.status(500).send("Database Error.");

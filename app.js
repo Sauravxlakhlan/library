@@ -42,21 +42,22 @@ app.get('/', (req, res) => res.redirect('/auth/login'));
 
 /**
  * STUDENT DASHBOARD
- * Updated to pass currentUserId to fix the EJS ReferenceError
+ * Updated to filter out 'Inactive' books and pass navigation context
  */
 app.get('/dashboard', async (req, res) => {
     // Check if user is logged in
     if (!req.session.userId) return res.redirect('/auth/login');
     
     try {
-        const books = await Book.find();
+        // FILTER: Only fetch books that are NOT 'Inactive'
+        const books = await Book.find({ status: { $ne: 'Inactive' } });
         
-        // Passing 'currentUserId' ensures the EJS logic can 
-        // distinguish between 'Issued' books and 'My' books.
+        // currentUserId is passed to fix EJS ReferenceErrors in the Vault logic
         res.render('dashboard', { 
             books: books, 
             user: req.session.userName,
-            currentUserId: req.session.userId 
+            currentUserId: req.session.userId,
+            page: 'dashboard' // Added for navbar highlighting if needed
         });
     } catch (err) {
         console.error("Dashboard Error:", err);
@@ -74,6 +75,7 @@ app.post('/issue/:id', async (req, res) => {
     try {
         const book = await Book.findById(req.params.id);
         
+        // Safety check: Only allow requests for books that are actually Available
         if (book && book.status === 'Available') {
             // Create a Request with Visual Data for the Admin Registry
             await Issue.create({
@@ -100,7 +102,7 @@ app.post('/issue/:id', async (req, res) => {
         } else {
             res.send(`
                 <script>
-                    alert('Book is currently unavailable or already requested.'); 
+                    alert('Book is currently unavailable, inactive, or already requested.'); 
                     window.location.href='/dashboard';
                 </script>
             `);
